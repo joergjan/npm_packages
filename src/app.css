@@ -37,7 +37,7 @@ h2 {
 }
 
 pre {
-	@apply py-4 px-3 my-3 rounded-lg shadow-lg;
+	@apply py-4 px-3 my-3 rounded-lg shadow-lg overflow-scroll;
 }
 
 a {

@@ -29,6 +29,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@vercel/analytics": "^1.2.2",
 		"shiki": "^1.2.4",
 		"svelte-lightbox-gallery": "^1.0.1"
 	}

@@ -2,18 +2,19 @@
 	import '../app.css';
 	import '../fonts.css';
 	import { fade } from 'svelte/transition';
-	import { currentPage } from '$lib/scripts/stores';
+	import { currentPage } from '$lib/client/stores';
 	import { onMount, beforeUpdate } from 'svelte';
 	import type { PageData } from './$types';
-	import { titles } from '$lib/scripts/navbar';
+	import { titles } from '$lib/client/navbar';
+	import { npmPackages } from '$lib/client/navbar';
 
 	import PageTransition from '$lib/components/transition.svelte';
 
 	export let data: PageData;
 
-	let mobileMenu = false;
-	let isMobile = false;
-	let tabTitle = `Jan Jörg | NPM`;
+	let mobileMenu: boolean = false;
+	let isMobile: boolean = false;
+	let tabTitle: string = `Jan Jörg`;
 
 	function menuToggle() {
 		if (mobileMenu) {
@@ -31,8 +32,8 @@
 			return;
 		}
 
-		for (let i = 0; i < titles.length; i++) {
-			if (data.url.includes(titles[i].path)) {
+		for (let i = 0; i < npmPackages.length; i++) {
+			if (data.url.includes(npmPackages[i].path)) {
 				$currentPage = i + 1;
 				break;
 			}
@@ -42,43 +43,17 @@
 	onMount(() => {
 		isMobile = window.innerWidth <= 1024;
 	});
-
-	function checkTitleIndex() {
-		if (data.url === '/') {
-			return -1;
-		} else {
-			for (let i = 0; i < titles.length; i++) {
-				if (data.url.includes(titles[i].path)) {
-					return i;
-				}
-			}
-		}
-		return 0;
-	}
-
-	onMount(() => {
-		window.addEventListener('popstate', updateTitle);
-		updateTitle();
-	});
-
-	function updateTitle() {
-		if (checkTitleIndex() === -1) {
-			tabTitle = 'MY NPM PACKAGES';
-			return;
-		}
-		tabTitle = titles[checkTitleIndex()].title;
-	}
-
-	beforeUpdate(updateTitle);
 </script>
 
 <svelte:head>
-	<title>{tabTitle}</title>
+	<title>NPM Packages</title>
 </svelte:head>
 
-<nav class="sticky top-0 z-40 overflow-hidden">
-	<div class="bg-gray-800 mx-auto max-w-7xl pt-2 pb-2 xl:pb-0 px-4 sm:px-6 xl:px-8">
-		<div class="flex h-16 py-2 justify-between">
+<div class="h-[120px] fixed top-0 w-screen bg-background z-40"></div>
+
+<header class="fixed top-0 w-screen right-0 mx-auto left-0 max-w-7xl z-40 overflow-hidden">
+	<nav class="px-5">
+		<div class="flex h-16 py-2 justify-start">
 			<div class="flex flex-shrink-0 items-center">
 				<button
 					class="group"
@@ -86,11 +61,9 @@
 						mobileMenu = false;
 					}}
 				>
-					<a href="/" class=" z-30">
+					<a href="https://www.jan-joerg.ch" class=" z-30">
 						<svg
-							class="{$currentPage !== 0
-								? 'fill-white'
-								: 'fill-blue-400'} group-hover:fill-blue-400 transition-all duration-400"
+							class="fill-white group-hover:fill-sky-300 transition-all duration-400"
 							xmlns="http://www.w3.org/2000/svg"
 							height="24"
 							viewBox="0 -960 960 960"
@@ -104,30 +77,37 @@
 				</button>
 			</div>
 
-			<ul class="hidden xl:flex justify-end space-x-24 w-full">
-				{#each titles as title, i}
-					<li
-						class={$currentPage === i + 1
-							? 'inline-flex items-center text-blue-400'
-							: 'inline-flex items-center hover:text-blue-400  hover:transition-all hover:duration-[400ms];'}
-					>
-						<button class="relative group">
-							<a href={title.path}>
-								<p class="font-semibold">
-									{title.name}
-								</p>
-							</a>
-						</button>
-					</li>
-				{/each}
+			<ul class="hidden xl:flex ml-16 w-full">
+				<div class="justify-start flex items-center w-full divide-x-2 divide-white">
+					{#each titles as title, i}
+						<li
+							class={i === titles.findIndex((t) => t.name.includes('NPM'))
+								? 'items-center text-sky-300'
+								: 'items-center hover:text-sky-300 hover:transition-all hover:duration-[400ms]'}
+						>
+							<div class="mx-12">
+								<button class="relative group">
+									<a href={title.path}>
+										<p class="font-semibold inline-flex">
+											{title.name}
+										</p>
+									</a>
+								</button>
+							</div>
+						</li>
+					{/each}
+				</div>
+				<li class="justify-end flex w-full items-center underline">
+					<a href="mailto:contact@jan-joerg.ch">contact me</a>
+				</li>
 			</ul>
 
-			<div class="xl:hidden flex items-center">
+			<div class="xl:hidden flex items-center justify-end w-full">
 				<button class="" on:click={menuToggle}>
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
 						height="24"
-						class="fill-white {mobileMenu ? 'rotate' : ''}"
+						class="fill-white transition-all duration-300 {mobileMenu ? 'rotate-90' : ''}"
 						viewBox="0 -960 960 960"
 						width="24"
 					>
@@ -142,23 +122,48 @@
 				</button>
 			</div>
 		</div>
-	</div>
-</nav>
+
+		<div class="flex h-14 py-2 justify-start">
+			<ul class="hidden xl:flex w-full">
+				<div class="justify-start flex items-center w-full divide-x-2 divide-white -ml-12">
+					{#each npmPackages as npm, i}
+						<li
+							class={$currentPage === i + 1 ||
+							($currentPage === 0 && i === titles.findIndex((t) => t.name.includes('NPM')))
+								? 'items-center text-sky-300'
+								: 'items-center hover:text-sky-300 hover:transition-all hover:duration-[400ms]'}
+						>
+							<div class="mx-12">
+								<button class="relative group">
+									<a href={npm.path}>
+										<p class="inline-flex">
+											{npm.name}
+										</p>
+									</a>
+								</button>
+							</div>
+						</li>
+					{/each}
+				</div>
+			</ul>
+		</div>
+	</nav>
+</header>
 
 {#if mobileMenu}
 	<div
 		in:fade={{ duration: 150 }}
 		out:fade={{ duration: 150, delay: 150 }}
-		class="fixed top-12 w-screen h-screen bg-gray-800 z-20"
+		class="fixed top-0 w-screen h-screen bg-background z-20"
 	>
-		<div class="pt-24">
+		<div class="pt-28">
 			{#each titles as title, i}
 				<a
 					href={title.path}
 					class="block px-4 py-2 hover place-content-end text-center"
 					on:click={menuToggle}
 				>
-					<p class="font-semibold">
+					<p class="font-semibold text-lg">
 						{title.name}
 					</p>
 				</a>
@@ -168,14 +173,16 @@
 {/if}
 
 <PageTransition key={data.url}>
-	<main>
-		<slot />
+	<main class="max-w-7xl mx-auto -mt-4">
+		<div class="mt-[120px] mx-3">
+			<slot />
+		</div>
 	</main>
 </PageTransition>
 
 <footer>
-	<div class="mx-auto max-w-7xl overflow-hidden pb-20 pt-0 px-6 xl:px-8">
-		<div class="bg-gray-500 h-1 mt-10 mb-8" />
+	<div class="mx-auto max-w-7xl overflow-hidden pb-20 pt-0 px-3">
+		<div class="bg-sky-300 h-1 mt-10 mb-8" />
 
 		<div class="mx-auto max-w-7xl overflow-hidden pb-20 pt-0 px-6 xl:px-8">
 			<nav class="-mb-6 columns-2 md:flex md:justify-center md:space-x-12" aria-label="Footer">

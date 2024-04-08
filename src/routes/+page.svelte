@@ -21,7 +21,7 @@
 		<div
 			class="rounded-full flex-none py-1 px-2 text-xs font-medium ring-1 ring-inset text-gray-400 bg-gray-400/10 ring-gray-400/20"
 		>
-			Preview
+			usage, installation, preview
 		</div>
 		<svg
 			class="h-5 w-5 flex-none text-gray-400"

@@ -123,7 +123,7 @@
 			</div>
 		</div>
 
-		<div class="flex h-14 py-2 justify-start">
+		<div class="flex h-14 py-2 justify-start -mx-2">
 			<ul class="hidden xl:flex w-full">
 				<div class="justify-start flex items-center w-full divide-x-2 divide-white -ml-12">
 					{#each npmPackages as npm, i}

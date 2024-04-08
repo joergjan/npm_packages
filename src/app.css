@@ -36,7 +36,7 @@
 	}
 	html {
 		font-family: 'Montserrat', sans-serif;
-		@apply text-center selection:bg-sky-600 selection:text-white;
+		@apply selection:bg-sky-600 selection:text-white;
 		@apply overflow-auto;
 	}
 }

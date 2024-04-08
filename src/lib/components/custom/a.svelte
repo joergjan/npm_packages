@@ -5,3 +5,9 @@
 <a {href} target="_blank">
 	<slot />
 </a>
+
+<style>
+	a {
+		@apply underline hover:text-blue-300;
+	}
+</style>
